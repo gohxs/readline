@@ -266,7 +266,7 @@ func (o *Operation) ioloop() {
 				o.t.Bell()
 			}
 		case CharDelete:
-			if o.buf.Len() > 0 || !o.IsNormalMode() {
+			if o.buf.Len() > 0 || !o.IsNormalMode() || o.cfg.NoEofOnEmptyDelete {
 				o.t.KickRead()
 				if !o.buf.Delete() {
 					o.t.Bell()
@@ -274,18 +274,16 @@ func (o *Operation) ioloop() {
 				break
 			}
 
-			if !o.cfg.NoEofOnEmptyDelete {
-				// treat as EOF
-				if !o.cfg.UniqueEditLine {
-					o.buf.WriteString(o.cfg.EOFPrompt + "\n")
-				}
-				o.buf.Reset()
-				isUpdateHistory = false
-				o.history.Revert()
-				o.errchan <- io.EOF
-				if o.cfg.UniqueEditLine {
-					o.buf.Clean()
-				}
+			// treat as EOF
+			if !o.cfg.UniqueEditLine {
+				o.buf.WriteString(o.cfg.EOFPrompt + "\n")
+			}
+			o.buf.Reset()
+			isUpdateHistory = false
+			o.history.Revert()
+			o.errchan <- io.EOF
+			if o.cfg.UniqueEditLine {
+				o.buf.Clean()
 			}
 		case CharInterrupt:
 			if o.IsSearchMode() {
