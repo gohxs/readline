@@ -274,16 +274,18 @@ func (o *Operation) ioloop() {
 				break
 			}
 
-			// treat as EOF
-			if !o.cfg.UniqueEditLine {
-				o.buf.WriteString(o.cfg.EOFPrompt + "\n")
-			}
-			o.buf.Reset()
-			isUpdateHistory = false
-			o.history.Revert()
-			o.errchan <- io.EOF
-			if o.cfg.UniqueEditLine {
-				o.buf.Clean()
+			if !o.cfg.NoEofOnEmptyDelete {
+				// treat as EOF
+				if !o.cfg.UniqueEditLine {
+					o.buf.WriteString(o.cfg.EOFPrompt + "\n")
+				}
+				o.buf.Reset()
+				isUpdateHistory = false
+				o.history.Revert()
+				o.errchan <- io.EOF
+				if o.cfg.UniqueEditLine {
+					o.buf.Clean()
+				}
 			}
 		case CharInterrupt:
 			if o.IsSearchMode() {
