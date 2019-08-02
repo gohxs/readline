@@ -105,9 +105,19 @@ func escapeExKey(key *escapeKeyPair) rune {
 	case 'Z':
 		r = MetaShiftTab
 	case 'D':
-		r = CharBackward
+		switch key.attr {
+		case "1;5":
+			r = MetaBackward
+		default:
+			r = CharBackward
+		}
 	case 'C':
-		r = CharForward
+		switch key.attr {
+		case "1;5":
+			r = MetaForward
+		default:
+			r = CharForward
+		}
 	case 'A':
 		r = CharPrev
 	case 'B':
